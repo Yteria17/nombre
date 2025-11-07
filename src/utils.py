@@ -1,5 +1,5 @@
 """
-Utilitaires pour le chargement et la préparation des données MNIST
+Utilitaires pour le chargement et la prÃ©paration des donnÃ©es MNIST
 """
 
 import numpy as np
@@ -11,12 +11,17 @@ import pickle
 
 def download_mnist(data_dir='data'):
     """
-    Télécharge le dataset MNIST depuis le serveur officiel de Yann LeCun
+    TÃ©lÃ©charge le dataset MNIST avec plusieurs miroirs de secours
 
     Args:
-        data_dir (str): Répertoire où sauvegarder les fichiers
+        data_dir (str): RÃ©pertoire oÃ¹ sauvegarder les fichiers
     """
-    base_url = 'http://yann.lecun.com/exdb/mnist/'
+    # Liste de miroirs (essayÃ©s dans l'ordre)
+    mirrors = [
+        'https://storage.googleapis.com/tensorflow/tf-keras-datasets/',
+        'http://yann.lecun.com/exdb/mnist/',
+        'https://ossci-datasets.s3.amazonaws.com/mnist/'
+    ]
 
     files = {
         'train_images': 'train-images-idx3-ubyte.gz',
@@ -25,19 +30,32 @@ def download_mnist(data_dir='data'):
         'test_labels': 't10k-labels-idx1-ubyte.gz'
     }
 
-    # Créer le répertoire s'il n'existe pas
+    # CrÃ©er le rÃ©pertoire s'il n'existe pas
     os.makedirs(data_dir, exist_ok=True)
 
     for key, filename in files.items():
         filepath = os.path.join(data_dir, filename)
 
         if not os.path.exists(filepath):
-            print(f"Téléchargement de {filename}...")
-            url = base_url + filename
-            request.urlretrieve(url, filepath)
-            print(f" {filename} téléchargé")
+            print(f"TÃ©lÃ©chargement de {filename}...")
+
+            # Essayer chaque miroir jusqu'Ã  ce que l'un fonctionne
+            success = False
+            for mirror in mirrors:
+                try:
+                    url = mirror + filename
+                    request.urlretrieve(url, filepath)
+                    print(f"âœ“ {filename} tÃ©lÃ©chargÃ© depuis {mirror}")
+                    success = True
+                    break
+                except Exception as e:
+                    print(f"  âœ— Ã‰chec depuis {mirror}: {str(e)[:50]}")
+                    continue
+
+            if not success:
+                raise Exception(f"Impossible de tÃ©lÃ©charger {filename} depuis aucun miroir")
         else:
-            print(f" {filename} déjà présent")
+            print(f"âœ“ {filename} dÃ©jÃ  prÃ©sent")
 
 
 def load_mnist_images(filepath):
@@ -51,7 +69,7 @@ def load_mnist_images(filepath):
         np.ndarray: Array d'images de forme (n_samples, 28, 28)
     """
     with gzip.open(filepath, 'rb') as f:
-        # Les 16 premiers octets sont des métadonnées
+        # Les 16 premiers octets sont des mÃ©tadonnÃ©es
         # magic number (4 bytes), nombre d'images (4 bytes),
         # hauteur (4 bytes), largeur (4 bytes)
         data = np.frombuffer(f.read(), np.uint8, offset=16)
@@ -71,7 +89,7 @@ def load_mnist_labels(filepath):
         np.ndarray: Array de labels de forme (n_samples,)
     """
     with gzip.open(filepath, 'rb') as f:
-        # Les 8 premiers octets sont des métadonnées
+        # Les 8 premiers octets sont des mÃ©tadonnÃ©es
         # magic number (4 bytes), nombre de labels (4 bytes)
         data = np.frombuffer(f.read(), np.uint8, offset=8)
 
@@ -83,28 +101,28 @@ def load_mnist(data_dir='data', flatten=False, normalize=True):
     Charge le dataset MNIST complet (train + test)
 
     Args:
-        data_dir (str): Répertoire contenant les fichiers MNIST
+        data_dir (str): RÃ©pertoire contenant les fichiers MNIST
         flatten (bool): Si True, aplatit les images (28x28) en vecteurs (784,)
-        normalize (bool): Si True, normalise les pixels de [0, 255] à [0, 1]
+        normalize (bool): Si True, normalise les pixels de [0, 255] Ã  [0, 1]
 
     Returns:
         tuple: (X_train, y_train, X_test, y_test)
-            - X_train: images d'entraînement (60000, 28, 28) ou (60000, 784)
-            - y_train: labels d'entraînement (60000,)
+            - X_train: images d'entraÃ®nement (60000, 28, 28) ou (60000, 784)
+            - y_train: labels d'entraÃ®nement (60000,)
             - X_test: images de test (10000, 28, 28) ou (10000, 784)
             - y_test: labels de test (10000,)
     """
-    # Télécharger si nécessaire
+    # TÃ©lÃ©charger si nÃ©cessaire
     download_mnist(data_dir)
 
-    # Charger les données
-    print("\nChargement des données MNIST...")
+    # Charger les donnÃ©es
+    print("\nChargement des donnÃ©es MNIST...")
     X_train = load_mnist_images(os.path.join(data_dir, 'train-images-idx3-ubyte.gz'))
     y_train = load_mnist_labels(os.path.join(data_dir, 'train-labels-idx1-ubyte.gz'))
     X_test = load_mnist_images(os.path.join(data_dir, 't10k-images-idx3-ubyte.gz'))
     y_test = load_mnist_labels(os.path.join(data_dir, 't10k-labels-idx1-ubyte.gz'))
 
-    print(f" Données chargées: {len(X_train)} images d'entraînement, {len(X_test)} images de test")
+    print(f"âœ“ DonnÃ©es chargÃ©es: {len(X_train)} images d'entraÃ®nement, {len(X_test)} images de test")
 
     # Normalisation
     if normalize:
@@ -140,13 +158,13 @@ def one_hot_encode(labels, num_classes=10):
 
 def create_batches(X, y, batch_size=32, shuffle=True):
     """
-    Crée des mini-batches pour l'entraînement
+    CrÃ©e des mini-batches pour l'entraÃ®nement
 
     Args:
-        X (np.ndarray): Données d'entrée
+        X (np.ndarray): DonnÃ©es d'entrÃ©e
         y (np.ndarray): Labels
         batch_size (int): Taille des batches
-        shuffle (bool): Mélanger les données
+        shuffle (bool): MÃ©langer les donnÃ©es
 
     Yields:
         tuple: (X_batch, y_batch)
@@ -166,10 +184,10 @@ def create_batches(X, y, batch_size=32, shuffle=True):
 
 def save_model(model, filepath):
     """
-    Sauvegarde un modèle entraîné
+    Sauvegarde un modÃ¨le entraÃ®nÃ©
 
     Args:
-        model: Le modèle à sauvegarder (doit avoir une méthode get_params())
+        model: Le modÃ¨le Ã  sauvegarder (doit avoir une mÃ©thode get_params())
         filepath (str): Chemin du fichier de sauvegarde
     """
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -177,23 +195,23 @@ def save_model(model, filepath):
     with open(filepath, 'wb') as f:
         pickle.dump(model, f)
 
-    print(f" Modèle sauvegardé dans {filepath}")
+    print(f"âœ“ ModÃ¨le sauvegardÃ© dans {filepath}")
 
 
 def load_model(filepath):
     """
-    Charge un modèle sauvegardé
+    Charge un modÃ¨le sauvegardÃ©
 
     Args:
         filepath (str): Chemin du fichier
 
     Returns:
-        Le modèle chargé
+        Le modÃ¨le chargÃ©
     """
     with open(filepath, 'rb') as f:
         model = pickle.load(f)
 
-    print(f" Modèle chargé depuis {filepath}")
+    print(f"âœ“ ModÃ¨le chargÃ© depuis {filepath}")
     return model
 
 
@@ -208,9 +226,9 @@ def get_data_stats(X, y):
     print(f"\n{'='*50}")
     print(f"STATISTIQUES DU DATASET")
     print(f"{'='*50}")
-    print(f"Forme des données: {X.shape}")
+    print(f"Forme des donnÃ©es: {X.shape}")
     print(f"Forme des labels: {y.shape}")
-    print(f"Type des données: {X.dtype}")
+    print(f"Type des donnÃ©es: {X.dtype}")
     print(f"Valeur min: {X.min():.4f}, max: {X.max():.4f}")
     print(f"\nDistribution des classes:")
 
