@@ -83,21 +83,31 @@ Input (784)  →  Hidden (128)  →  Hidden (64)  →  Output (10)
 
 ```
 nombre/
-├── src/                   # Code source
-│   ├── network.py         # Réseau de neurones
-│   ├── layers.py          # Couches
-│   ├── activations.py     # Fonctions d'activation
-│   ├── losses.py          # Fonctions de coût
-│   ├── optimizers.py      # Optimisateurs
-│   ├── utils.py           # Utilitaires
-│   ├── visualize.py       # Visualisation
-│   └── metrics.py         # Métriques
-├── notebooks/             # Notebooks Jupyter
-├── tests/                 # Tests unitaires
-├── models/                # Modèles sauvegardés
-├── train.py               # Script d'entraînement
-├── evaluate.py            # Script d'évaluation
-└── draw_interface.py      # Interface de test
+├── src/                              # Code source professionnel
+│   ├── network.py                    # Classe NeuralNetwork complète
+│   ├── layers.py                     # Dense, Dropout, BatchNorm
+│   ├── activations.py                # ReLU, Sigmoid, Softmax, Tanh
+│   ├── losses.py                     # Cross-Entropy, MSE
+│   ├── optimizers.py                 # SGD, Momentum, Adam, RMSprop
+│   ├── utils.py                      # Chargement MNIST, helpers
+│   ├── visualize.py                  # Graphiques et visualisations
+│   └── metrics.py                    # Accuracy, confusion matrix
+│
+├── notebooks/                        # 📓 Série complète de tutoriels
+│   ├── 00_introduction_reseaux_neurones.ipynb    # Concepts de base
+│   ├── 01_exploration_mnist.ipynb                # Dataset MNIST
+│   ├── 02_forward_propagation.ipynb              # Forward pass
+│   ├── 03_backpropagation.ipynb                  # Backprop & learning
+│   ├── 04_building_complete_network.ipynb        # Réseau complet
+│   ├── 05_improvements_optimization.ipynb        # Optimisations
+│   ├── 06_introduction_cnn.ipynb                 # CNN basics 🔥
+│   └── 07_debugging_gradient_checking.ipynb      # Debugging tools 🐛
+│
+├── tests/                            # Tests unitaires
+├── models/                           # Modèles entraînés
+├── train.py                          # Script d'entraînement CLI
+├── evaluate.py                       # Évaluation de modèles
+└── draw_interface.py                 # 🎨 Interface graphique interactive
 ```
 
 ## 📚 Documentation
@@ -108,20 +118,87 @@ nombre/
 
 ## 🎓 Apprendre avec ce Projet
 
-### 1. Comprendre les Bases
-Lisez `ARCHITECTURE.md` pour comprendre :
-- La propagation avant (forward pass)
-- La rétropropagation (backpropagation)
-- La descente de gradient
-- Les fonctions d'activation
+### 📓 Parcours d'Apprentissage (8 Notebooks)
 
-### 2. Explorer le Code
-Commencez par les notebooks :
-1. `01_exploration.ipynb` - Dataset MNIST
-2. `02_simple_network.ipynb` - Premier réseau
-3. `03_improvements.ipynb` - Optimisations
+#### **Niveau Débutant** 🌱
 
-### 3. Expérimenter
+1. **`00_introduction_reseaux_neurones.ipynb`**
+   - 🧠 Concepts fondamentaux
+   - Anatomie d'un neurone artificiel
+   - Fonctions d'activation (ReLU, Sigmoid, Softmax)
+   - Architecture réseau et cycle d'apprentissage
+   - Exemple : Problème XOR
+
+2. **`01_exploration_mnist.ipynb`**
+   - 🔍 Découverte du dataset MNIST
+   - Visualisation des données (25 échantillons)
+   - Distribution des classes
+   - Analyse pixel par pixel
+   - Variabilité intra-classe
+
+3. **`02_forward_propagation.ipynb`**
+   - ➡️ Comment un réseau fait des prédictions
+   - Implémentation pas à pas
+   - Initialisation des poids (He)
+   - Test sur données réelles
+   - Visualisation des activations
+
+4. **`03_backpropagation.ipynb`**
+   - ⬅️ Comment un réseau apprend
+   - Fonction de coût (Cross-Entropy)
+   - Descente de gradient
+   - Implémentation complète
+   - Cycle d'entraînement
+
+#### **Niveau Intermédiaire** 🚀
+
+5. **`04_building_complete_network.ipynb`**
+   - 🏗️ Construire un réseau complet from scratch
+   - Classe NeuralNetwork modulaire
+   - Entraînement sur MNIST (60k exemples)
+   - Visualisations (loss, accuracy, confusion matrix)
+   - Sauvegarde/chargement modèle
+   - **Résultat : ~95-97% accuracy**
+
+6. **`05_improvements_optimization.ipynb`**
+   - 🚀 Optimisations avancées
+   - Comparaison d'architectures
+   - Impact du learning rate
+   - Data augmentation
+   - Optimiseurs (SGD, Momentum, Adam)
+   - **Path to 98%+ accuracy**
+
+#### **Niveau Avancé** 🔥
+
+7. **`06_introduction_cnn.ipynb`** 🔥
+   - 🖼️ Réseaux Convolutifs (CNN)
+   - Pourquoi les CNN pour les images ?
+   - Opération de convolution (filtres)
+   - Max pooling
+   - SimpleCNN from scratch
+   - Feature maps visualization
+   - **~98-99% accuracy possible**
+
+8. **`07_debugging_gradient_checking.ipynb`** 🐛
+   - 🔍 Debugging et validation
+   - Gradient checking numérique
+   - Vanishing/exploding gradients
+   - Checklist de debugging complète
+   - Outils de monitoring
+   - **Compétence essentielle !**
+
+### 💻 Applications Pratiques
+
+#### 🎨 **Interface Graphique**
+```bash
+python draw_interface.py
+```
+- Dessiner à la souris
+- Prédiction en temps réel
+- Visualisation des probabilités
+- Parfait pour démos et tests !
+
+### 🔬 Expérimenter
 Testez différentes configurations :
 - Nombre de couches
 - Taille des couches
